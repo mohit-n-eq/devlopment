@@ -4,28 +4,38 @@ on:
   pull_request:
     branches:
       - main
+      - master
       - development
 
 jobs:
   lint-schema-labels:
     name: Prevent Hardcoded Labels
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Scan for Hardcoded Strings
         run: |
           if grep -rnP '"(name|label|info|placeholder|content)"\s*:\s*"(?!t:)[^"]+"' sections/ blocks/ 2>/dev/null; then
-            echo "🚨 ERROR: Hardcoded schema strings detected!"
+            echo ""
+            echo "🚨 ERROR: Hardcoded schema strings detected in the files listed above!"
+            echo "Please replace them with translation keys (e.g., \"label\": \"t:sections.xyz\")."
             exit 1
+          else
+            echo "✅ All schema UI strings are using proper translation keys."
           fi
 
   theme-check:
     name: Verify All Locale Files
     runs-on: ubuntu-latest
+    
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Shopify Theme Check
         uses: shopify/theme-check-action@v2
         with:
-          # This automatically scans all locales to ensure no keys are missing!
           token: ${{ github.token }}
