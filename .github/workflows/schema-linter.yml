@@ -1,0 +1,29 @@
+name: Enforce Schema Translation Keys
+
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+      - development
+
+jobs:
+  lint-schema-labels:
+    name: Prevent Hardcoded Labels
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Scan for Hardcoded Strings
+        run: |
+          # Searches sections and blocks for standard UI keys that don't start with t:
+          if grep -rnP '"(name|label|info|placeholder|content)"\s*:\s*"(?!t:)[^"]+"' sections/ blocks/ 2>/dev/null; then
+            echo ""
+            echo "🚨 ERROR: Hardcoded schema strings detected in the files listed above!"
+            echo "Please replace them with translation keys (e.g., \"label\": \"t:sections.xyz\")."
+            exit 1
+          else
+            echo "✅ All schema UI strings are using proper translation keys."
+          fi
