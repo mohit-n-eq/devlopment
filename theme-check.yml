@@ -1,0 +1,5 @@
+extends: theme-check:theme-app-extension
+
+MatchingTranslations:
+  enabled: true
+  severity: error
